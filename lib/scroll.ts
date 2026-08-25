@@ -18,11 +18,12 @@ export function stopScroll() {
   document.body.style.overflow = "hidden";
 }
 
-/** Release page scrolling. */
+/** Release page scrolling. Always clears any leftover overflow locks. */
 export function startScroll() {
   const lenis = getLenis();
   if (lenis) lenis.start();
   document.body.style.removeProperty("overflow");
+  document.documentElement.style.removeProperty("overflow");
 }
 
 export function scrollToTop(immediate = false) {

@@ -39,13 +39,24 @@ export function SmoothScroll() {
 
     try {
       window.scrollTo(0, 0);
-      instance = new Lenis({ smoothWheel: true });
-      window.__lenis = instance;
-      const raf = (time: number) => {
-        instance?.raf(time);
+      // Only enable Lenis virtual scrolling on fine-pointer (mouse/trackpad)
+      // devices. On touch devices, native momentum scrolling must be preserved
+      // — hijacking it breaks mobile scrolling entirely.
+      const isFinePointer =
+        typeof window.matchMedia === "function" &&
+        window.matchMedia("(pointer: fine)").matches;
+
+      if (!isFinePointer) {
+        instance = null;
+      } else {
+        instance = new Lenis({ smoothWheel: true });
+        window.__lenis = instance;
+        const raf = (time: number) => {
+          instance?.raf(time);
+          rafId = requestAnimationFrame(raf);
+        };
         rafId = requestAnimationFrame(raf);
-      };
-      rafId = requestAnimationFrame(raf);
+      }
     } catch (e) {
       console.warn("Lenis scroll fallback", e);
     }

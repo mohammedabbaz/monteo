@@ -33,6 +33,17 @@ img { display: block; max-width: 100%; height: auto; }
 .sr-only-focusable:focus { position: fixed; top: 1rem; left: 1rem; z-index: 999; background: #0b0d0e; color: #fff; padding: 0.75rem 1.25rem; border-radius: 9999px; }
 :focus-visible { outline: 2px solid #e85d2a; outline-offset: 2px; }
 
+/* ------------------------------------------------------------
+   Lenis smooth-scroll engine — REQUIRED companion CSS.
+   Without it, `html { scroll-behavior: smooth }` fights the
+   engine and scroll locking/unlocking silently breaks.
+   ------------------------------------------------------------ */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
+
 :root {
   --background: #ffffff;
   --foreground: #151515;
