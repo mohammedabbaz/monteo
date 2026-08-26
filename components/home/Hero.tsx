@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import herosection from '@/assets/hero-mep-technical.jpg.jpg'
 
 const SLIDES = [
   {
@@ -40,17 +39,13 @@ const SLIDES = [
 const HERO_REVEAL_IMG1 =
   "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=2000&q=85";
 
-  const HERO_REVEAL_IMG =
-  herosection;
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
   const leftRef = useRef<HTMLDivElement>(null);
   const rightRef = useRef<HTMLDivElement>(null);
   const watermarkRef = useRef<HTMLDivElement>(null);
-  const liquidWrapRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Carousel state
   const [slideIdx, setSlideIdx] = useState(0);
@@ -80,37 +75,11 @@ export function Hero() {
     const left = leftRef.current;
     const right = rightRef.current;
     const watermark = watermarkRef.current;
-    const liquidWrap = liquidWrapRef.current;
     const card = cardRef.current;
-    const canvas = canvasRef.current;
-    const ctx = canvas ? canvas.getContext("2d") : null;
-
-    const revealedImg = new Image();
-    revealedImg.crossOrigin = "anonymous";
-    revealedImg.src = HERO_REVEAL_IMG.src;
-
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    let brushRadius = 150;
-    let isDesktop = window.innerWidth >= 1024;
-    let trail: { x: number; y: number; radius: number; age: number }[] = [];
 
     let mouse = { x: 0, y: 0, targetX: 0, targetY: 0, isInside: false };
     let currentTilt = { x: 0, y: 0, targetX: 0, targetY: 0 };
     let currentCardTilt = { x: 0, y: 0, targetX: 0, targetY: 0 };
-
-    const resizeCanvas = () => {
-      if (!canvas) return;
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-    };
-    resizeCanvas();
-
-    const onResize = () => {
-      isDesktop = window.innerWidth >= 1024;
-      resizeCanvas();
-    };
-    window.addEventListener("resize", onResize);
 
     const onPointerEnter = () => {
       mouse.isInside = true;
@@ -127,37 +96,23 @@ export function Hero() {
     const onPointerMove = (e: PointerEvent) => {
       if (!section) return;
       const rect = section.getBoundingClientRect();
-      const clientX = e.clientX;
-      const clientY = e.clientY;
+      const visX = e.clientX - rect.left;
+      const visY = e.clientY - rect.top;
 
-      mouse.targetX = clientX - rect.left;
-      mouse.targetY = clientY - rect.top;
+      mouse.targetX = visX;
+      mouse.targetY = visY;
       mouse.isInside = true;
 
       if (glow) {
         glow.style.opacity = "1";
-        glow.style.left = mouse.targetX + "px";
-        glow.style.top = mouse.targetY + "px";
+        glow.style.left = visX + "px";
+        glow.style.top = visY + "px";
       }
 
-      const normX = (mouse.targetX / rect.width) * 2 - 1;
-      const normY = (mouse.targetY / rect.height) * 2 - 1;
+      const normX = (visX / rect.width) * 2 - 1;
+      const normY = (visY / rect.height) * 2 - 1;
       currentTilt.targetX = normX;
       currentTilt.targetY = normY;
-
-      if (canvas && isDesktop && ctx) {
-        const cRect = canvas.getBoundingClientRect();
-        const canvasX = (clientX - cRect.left) * dpr;
-        const canvasY = (clientY - cRect.top) * dpr;
-        if (
-          canvasX >= 0 &&
-          canvasY >= 0 &&
-          canvasX <= canvas.width &&
-          canvasY <= canvas.height
-        ) {
-          trail.push({ x: canvasX, y: canvasY, radius: brushRadius * dpr, age: 1.0 });
-        }
-      }
     };
 
     const onCardMove = (e: PointerEvent) => {
@@ -218,12 +173,8 @@ export function Hero() {
         watermark.style.transform = `translate3d(${wMoveX}px, ${wMoveY}px, 0)`;
       }
 
-      // Parallax 4: Background image counter-pan
-      if (liquidWrap) {
-        const bMoveX = currentTilt.x * -10;
-        const bMoveY = currentTilt.y * -10;
-        liquidWrap.style.transform = `scale(1.04) translate3d(${bMoveX}px, ${bMoveY}px, 0)`;
-      }
+      // Parallax 4: (removed — a transformed ancestor breaks the X-ray lens
+      // coordinate mapping, so the background is now static)
 
       // Dynamic 3D tilt on the carousel card
       if (card) {
@@ -234,41 +185,12 @@ export function Hero() {
         }
       }
 
-      // Liquid reveal painting
-      if (ctx && canvas && isDesktop) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        if (trail.length > 0 && revealedImg.complete) {
-          ctx.save();
-          for (let i = trail.length - 1; i >= 0; i--) {
-            const p = trail[i];
-            const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * p.age);
-            grad.addColorStop(0, `rgba(0,0,0,${p.age * 0.95})`);
-            grad.addColorStop(0.6, `rgba(0,0,0,${p.age * 0.45})`);
-            grad.addColorStop(1, "rgba(0,0,0,0)");
-
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.radius * p.age, 0, Math.PI * 2);
-            ctx.fill();
-
-            p.age -= 0.018;
-            if (p.age <= 0) trail.splice(i, 1);
-          }
-
-          ctx.globalCompositeOperation = "source-in";
-          ctx.drawImage(revealedImg, 0, 0, canvas.width, canvas.height);
-          ctx.restore();
-        }
-      }
-
       rafId = requestAnimationFrame(animate);
     };
     rafId = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(rafId);
-      window.removeEventListener("resize", onResize);
       if (section) {
         section.removeEventListener("pointerenter", onPointerEnter);
         section.removeEventListener("pointerleave", onPointerLeave);
@@ -313,18 +235,72 @@ export function Hero() {
 
   const slide = SLIDES[slideIdx];
 
+  /* ------- X-ray lens state (clean base + clipped technical layer) ------- */
+  const [lens, setLens] = useState<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    // Touch devices: never activate the lens
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const update = (e: MouseEvent) => {
+      const rect = section.getBoundingClientRect();
+      setLens({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      });
+    };
+    const reset = () => setLens(null);
+
+    section.addEventListener("mousemove", update);
+    section.addEventListener("mouseleave", reset);
+    return () => {
+      section.removeEventListener("mousemove", update);
+      section.removeEventListener("mouseleave", reset);
+    };
+  }, []);
+
   return (
     <section id="home" ref={sectionRef}>
       <div className="hero-mouse-glow" ref={glowRef} aria-hidden="true" />
 
-      <div className="liquid-reveal-wrap" ref={liquidWrapRef}>
+      {/* X-RAY HERO IMAGE — full-section background layer.
+          Both images share ONE container and ONE identical pixel box
+          (absolute inset-0, object-cover), so they are perfectly aligned.
+          The technical image NEVER moves; only its circular clip-path
+          follows the cursor. Sits BELOW the vignette (z-1) and the hero
+          content (z-20). */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        {/* CLEAN IMAGE */}
         <img
-          className="hero-base"
-          src="https://images.unsplash.com/photo-1581244277943-fe4a9c77d389?auto=format&fit=crop&w=2400&q=85"
-          alt="Artisan plombier électricien qualifié tuyauterie et cuivre"
+          src="/hero-mep-clean.jpg"
+          alt="MEP engineering environment"
+          className="absolute inset-0 h-full w-full object-cover object-center"
         />
-        <canvas className="hero-canvas" ref={canvasRef} aria-hidden="true" />
+
+        {/* TECHNICAL IMAGE — same box as clean, revealed via clip-path only */}
+        <img
+          src="/hero-mep-technical.jpg"
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center"
+          style={{
+            clipPath: lens
+              ? `circle(130px at ${lens.x}px ${lens.y}px)`
+              : "circle(0px at 0 0)",
+          }}
+        />
       </div>
+
+      {/* LENS BORDER */}
+      {lens && (
+        <div
+          className="pointer-events-none absolute z-[2] h-[260px] w-[260px] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/80 shadow-[0_0_25px_rgba(0,0,0,0.35)]"
+          style={{ left: lens.x, top: lens.y }}
+        />
+      )}
 
       <div className="hero-vignette" />
       <div
