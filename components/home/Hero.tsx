@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { SERVICES } from "@/data/services";
 
 const SLIDES = [
   {
@@ -326,6 +327,28 @@ export function Hero() {
               </span>
             </h1>
 
+            {/* Mobile-only services list (for conversion) */}
+            <div className={`hero-services-mobile reveal-fade-up ${fadesActive ? "active" : ""}`}>
+              {SERVICES.map((s) => (
+                <Link
+                  key={s.slug}
+                  href={`/services/${s.slug}`}
+                  className="hero-service-item"
+                >
+                  <span className="hero-service-index">{s.index}</span>
+                  <span className="hero-service-body">
+                    <span className="hero-service-title">{s.title}</span>
+                    <span className="hero-service-desc">{s.shortDesc}</span>
+                  </span>
+                  <span className="hero-service-arrow">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                  </span>
+                </Link>
+              ))}
+            </div>
+
             <p className={`hero-subtitle reveal-fade-up ${fadesActive ? "active" : ""}`}>
               Plomberie de précision, électricité sécurisée, dépannage express 7j/7 et rénovations
               sur-mesure. Des artisans chevronnés au service de votre confort.
@@ -400,7 +423,7 @@ export function Hero() {
           </div>
 
           <div className="hero-right" ref={rightRef}>
-            {/* Hero Carousel Card */}
+            {/* Hero Carousel Card — desktop/tablet only (mobile shows the services list above) */}
             <div className={`hero-card reveal-fade-up spotlight-card ${fadesActive ? "active" : ""}`} ref={cardRef}>
               <div className="hero-card-inner" id="hero-card-click" onClick={advanceSlide}>
                 <div className="hero-card-tile" style={{ background: slide.bg }}>
