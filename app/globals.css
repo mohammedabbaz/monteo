@@ -1581,6 +1581,9 @@ html.lenis, html.lenis body { height: auto; }
 @media (max-width: 639.98px) {
   .hero-card { display: none; }
   .hero-badges-row { display: none; }
+  .hero-subtitle { display: none; }
+  .emergency-badge { display: none; }
+  .cta-row .cta-secondary { display: none; }
 }
 
 /* Mobile services list in the hero (hidden on tablet/desktop) */

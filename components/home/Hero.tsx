@@ -368,7 +368,7 @@ export function Hero() {
                   </svg>
                 </span>
               </Link>
-              <a href="#services" className="pill-btn no-arrow btn-outline">
+              <a href="#services" className="pill-btn no-arrow btn-outline cta-secondary">
                 <span>Voir nos services</span>
               </a>
             </div>
