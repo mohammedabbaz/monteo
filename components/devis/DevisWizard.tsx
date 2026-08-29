@@ -160,6 +160,9 @@ const SERVICE_TO_TRADE: Record<string, string> = {
 
 interface Recap {
   ref: string;
+  name: string;
+  email: string;
+  address: string;
   service: string;
   housing: string;
   urgency: string;
@@ -259,6 +262,9 @@ export function DevisWizard() {
     setTimeout(() => {
       setRecap({
         ref: refNumber,
+        name: name.trim(),
+        email: email.trim(),
+        address: address.trim(),
         service: `${tradeTitle} (${subOption})`,
         housing,
         urgency,
@@ -634,6 +640,25 @@ export function DevisWizard() {
         {/* SUCCESS & RECAP SCREEN */}
         {recap && (
           <div className="devis-success-card active">
+            {/* Print-only branded document header */}
+            <div className="devis-print-header">
+              <div className="devis-print-header-top">
+                <div className="devis-print-brand">
+                  <span className="devis-print-brand-dot" />
+                  MONTÉO
+                </div>
+                <div className="devis-print-doc-type">DEVIS</div>
+              </div>
+              <div className="devis-print-header-sub">
+                Récapitulatif de votre demande de devis — Émis le{" "}
+                {new Date().toLocaleDateString("fr-FR", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </div>
+            </div>
+
             <div className="success-badge">
               <span className="icon">
                 <svg viewBox="0 0 24 24">
@@ -676,6 +701,26 @@ export function DevisWizard() {
 
             {/* Detailed Recap Box */}
             <div className="devis-recap-box">
+              <div className="recap-section-title">Coordonnées du client</div>
+              <div className="recap-row">
+                <span className="recap-label">Nom &amp; prénom</span>
+                <span className="recap-val">{recap.name}</span>
+              </div>
+              <div className="recap-row">
+                <span className="recap-label">Téléphone</span>
+                <span className="recap-val">{recap.phone}</span>
+              </div>
+              <div className="recap-row">
+                <span className="recap-label">E-mail</span>
+                <span className="recap-val recap-val-wrap">{recap.email}</span>
+              </div>
+              {recap.address && (
+                <div className="recap-row">
+                  <span className="recap-label">Adresse d'intervention</span>
+                  <span className="recap-val recap-val-wrap">{recap.address}</span>
+                </div>
+              )}
+              <div className="recap-section-title">Détails de la prestation</div>
               <div className="recap-row">
                 <span className="recap-label">Référence du dossier</span>
                 <span className="recap-val accent">{recap.ref}</span>
@@ -707,6 +752,7 @@ export function DevisWizard() {
             </div>
 
             <div
+              className="devis-success-actions"
               style={{
                 display: "flex",
                 flexWrap: "wrap",
@@ -739,6 +785,19 @@ export function DevisWizard() {
               >
                 <span>Retour à l'accueil</span>
               </button>
+            </div>
+
+            {/* Print-only branded document footer */}
+            <div className="devis-print-footer">
+              <div className="devis-print-footer-note">
+                Estimation indicative et non contractuelle. Un technicien MONTÉO validera le devis
+                définitif sur place avant tout démarrage des travaux. Déplacement et diagnostic gratuits.
+              </div>
+              <div className="devis-print-footer-contact">
+                <span>MONTÉO — Plomberie &amp; Électricité</span>
+                <span>04 67 00 00 00 — contact@monteo.fr</span>
+                <span>Montpellier &amp; Métropole (25 km) — 7j/7</span>
+              </div>
             </div>
           </div>
         )}
