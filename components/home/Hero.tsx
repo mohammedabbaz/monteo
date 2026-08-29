@@ -67,7 +67,6 @@ export function Hero() {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [resetCarouselTimer]);
-
   /* ---------------- Mouse physics, parallax & liquid reveal ---------------- */
   useEffect(() => {
     const section = sectionRef.current;
@@ -202,7 +201,6 @@ export function Hero() {
       }
     };
   }, []);
-
   /* ------------- Entrance animations coordinated with the loader ------------- */
   useEffect(() => {
     const trigger = () => {
@@ -217,7 +215,6 @@ export function Hero() {
     window.addEventListener("monteo:ready", trigger);
     return () => window.removeEventListener("monteo:ready", trigger);
   }, []);
-
   const nextSlide = (e: React.MouseEvent) => {
     e.stopPropagation();
     setSlideIdx((i) => (i + 1) % SLIDES.length);
@@ -232,12 +229,9 @@ export function Hero() {
     setSlideIdx((i) => (i + 1) % SLIDES.length);
     resetCarouselTimer();
   };
-
   const slide = SLIDES[slideIdx];
-
   /* ------- X-ray lens state (clean base + clipped technical layer) ------- */
   const [lens, setLens] = useState<{ x: number; y: number } | null>(null);
-
   useEffect(() => {
     // Touch devices: never activate the lens
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
@@ -261,7 +255,6 @@ export function Hero() {
       section.removeEventListener("mouseleave", reset);
     };
   }, []);
-
   return (
     <section id="home" ref={sectionRef}>
       <div className="hero-mouse-glow" ref={glowRef} aria-hidden="true" />
