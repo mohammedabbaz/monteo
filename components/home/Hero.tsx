@@ -269,14 +269,14 @@ export function Hero() {
       <div className="absolute inset-0 z-0 overflow-hidden">
         {/* CLEAN IMAGE */}
         <img
-          src="/hero-mep-clean.jpg"
+          src="./hero-mep-clean.jpg"
           alt="MEP engineering environment"
           className="absolute inset-0 h-full w-full object-cover object-center"
         />
 
         {/* TECHNICAL IMAGE — same box as clean, revealed via clip-path only */}
         <img
-          src="/hero-mep-technical.jpg"
+          src="./hero-mep-technical.jpg"
           alt=""
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center"
